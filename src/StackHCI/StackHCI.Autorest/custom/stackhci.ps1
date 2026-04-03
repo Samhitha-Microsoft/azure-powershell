@@ -2126,6 +2126,7 @@ function Verify-NodesArcRegistrationState{
         ComputerName  = $computerNames
         ScriptBlock   = $checkBlock
         ArgumentList  = @($SubscriptionId, $ArcResourceGroupName)
+        ThrottleLimit = 70
         ErrorAction   = 'Continue'
         ErrorVariable = 'remoteErrors'
     }
@@ -2135,8 +2136,9 @@ function Verify-NodesArcRegistrationState{
 
     $results = Invoke-Command @invokeParams
 
-    # Filter remoteErrors for transport/session-open failures only (not in-script errors)
+    # Classify remote errors
     $unreachableNodes = [System.Collections.ArrayList]::new()
+    $scriptErrors = [System.Collections.ArrayList]::new()
     foreach ($err in $remoteErrors)
     {
         if ($err.CategoryInfo.Category -eq 'OpenError')
@@ -2146,11 +2148,31 @@ function Verify-NodesArcRegistrationState{
             $targetNode = if ($err.TargetObject) { "$($err.TargetObject)" } else { "Unknown" }
             $unreachableNodes.Add($targetNode) | Out-Null
         }
+        else
+        {
+            # In-script error (e.g. azcmagent failure, JSON parse error)
+            $errMsg = if ($err.Exception) { $err.Exception.Message } else { "$err" }
+            Write-WarnLog "[Arc Verify] Script error on remote node: $errMsg"
+            $scriptErrors.Add($errMsg) | Out-Null
+        }
     }
 
     if ($unreachableNodes.Count -gt 0)
     {
         throw "Cannot verify Arc registration state on unreachable node(s): $($unreachableNodes -join ', '). Ensure all cluster nodes are online and accessible via WinRM before registering."
+    }
+
+    if ($scriptErrors.Count -gt 0)
+    {
+        throw "Failed to verify Arc registration state on one or more nodes:`n$($scriptErrors -join "`n")"
+    }
+
+    # Validate we received results from all nodes
+    $resultCount = if ($results -eq $null) { 0 } else { $results.Count }
+    $expectedCount = $computerNames.Count
+    if ($resultCount -ne $expectedCount)
+    {
+        throw "Arc registration state verification incomplete: expected results from $expectedCount node(s) but received from $resultCount. Some nodes may have failed silently."
     }
 
     # Check structured results for subscription/RG mismatches
@@ -3115,6 +3137,7 @@ function Test-ClusterArcEnabled {
         ComputerName  = $computerNames
         ScriptBlock   = $checkBlock
         ArgumentList  = @($SubscriptionId, $ArcResourceGroupName)
+        ThrottleLimit = 70
         ErrorAction   = 'Continue'
         ErrorVariable = 'remoteErrors'
     }
