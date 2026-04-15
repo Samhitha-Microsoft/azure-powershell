@@ -227,6 +227,11 @@ Describe 'StackHCI Utility Functions' {
 
     Describe 'Execute-Without-ProgressBar' {
 
+        BeforeEach {
+            # Suppress Write-ErrorLog output that interferes with Pester's Should -Throw
+            Mock Write-ErrorLog { }
+        }
+
         It 'Executes script block and returns result' {
             $result = Execute-Without-ProgressBar -ScriptBlock { 42 }
             $result | Should -Be 42

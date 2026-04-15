@@ -8,6 +8,16 @@ Describe 'StackHCI Remote Support Functions' {
         $customPath = Join-Path $PSScriptRoot '..' 'custom' 'stackhci.ps1'
         . $customPath
 
+        # Stub for Windows-only commands not available on Linux/macOS
+        if (-not (Get-Command 'Get-Service' -ErrorAction SilentlyContinue)) {
+            function global:Get-Service { }
+        }
+
+        # Ensure $env:Temp is set (it's null on Linux/macOS)
+        if ([string]::IsNullOrEmpty($env:Temp)) {
+            $env:Temp = [System.IO.Path]::GetTempPath()
+        }
+
         function Write-WarnLog { param([string]$Message) }
         function Write-VerboseLog { param([string]$Message) }
         function Write-InfoLog { param([string]$Message) }
