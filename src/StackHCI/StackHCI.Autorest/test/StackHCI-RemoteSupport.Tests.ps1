@@ -99,7 +99,7 @@ Describe 'StackHCI Remote Support Functions' {
             Mock Setup-Logging { return $TestDrive }
             Mock Remove-PSSession { }
             Mock Retry-Command {
-                # Just call the scriptblock once without retries
+                param($ScriptBlock)
                 Invoke-Command -ScriptBlock $ScriptBlock
             }
 

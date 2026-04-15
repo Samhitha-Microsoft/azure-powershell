@@ -303,7 +303,7 @@ Describe 'StackHCI Logging Functions' {
                 $result = Setup-Logging -LogsDirectory $tempDir -LogFilePrefix 'TestLog' -DebugEnabled $false
                 $result | Should -Be $tempDir
                 Test-Path $tempDir | Should -Be $true
-                $global:LogFileName | Should -BeLike "$tempDir/TestLog_*.log"
+                $global:LogFileName | Should -BeLike "$tempDir*TestLog_*.log"
             } finally {
                 $global:LogFileName = $null
                 Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue

@@ -2,9 +2,10 @@ Describe 'StackHCI Registration Functions' {
 
     BeforeAll {
         $privateDll = Join-Path $PSScriptRoot '..' 'bin' 'Az.StackHCI.private.dll'
-        if (Test-Path $privateDll) {
-            Add-Type -Path $privateDll -ErrorAction SilentlyContinue
+        if (-not (Test-Path $privateDll)) {
+            throw "Az.StackHCI.private.dll not found at '$privateDll'. Run a build first (dotnet msbuild build.proj /p:Scope=StackHCI) to generate the required assembly."
         }
+        Add-Type -Path $privateDll -ErrorAction SilentlyContinue
         $customPath = Join-Path $PSScriptRoot '..' 'custom' 'stackhci.ps1'
         . $customPath
 
