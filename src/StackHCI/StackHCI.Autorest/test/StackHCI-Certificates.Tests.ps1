@@ -23,7 +23,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
 
             # The function creates a PSSession then calls Invoke-Command -Session.
             # We need Invoke-Command mock to handle the Invoke-WebRequest call inside.
-            Mock New-PSSession { return New-Object PSObject }
+            Mock New-PSSession { return (New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession') }
             Mock Invoke-Command {
                 return [PSCustomObject]@{ StatusCode = 200 }
             }
@@ -41,7 +41,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
             $clusterNodes = @([PSCustomObject]@{ Name = 'Node1' })
             $failedNodes = [System.Collections.ArrayList]::new()
 
-            Mock New-PSSession { return New-Object PSObject }
+            Mock New-PSSession { return (New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession') }
             Mock Invoke-Command {
                 return [PSCustomObject]@{ StatusCode = 500 }
             }
@@ -68,7 +68,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
             $clusterNodes = @([PSCustomObject]@{ Name = 'Node1' })
             $failedNodes = [System.Collections.ArrayList]::new()
 
-            Mock New-PSSession { return New-Object PSObject }
+            Mock New-PSSession { return (New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession') }
             Mock Invoke-Command { return $null }
 
             Check-ConnectionToCloudBillingService -ClusterNodes $clusterNodes -HealthEndpoint 'https://test/health' -HealthEndPointCheckFailedNodes $failedNodes -ClusterDNSSuffix 'contoso.local'
@@ -84,7 +84,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
             )
             $failedNodes = [System.Collections.ArrayList]::new()
 
-            Mock New-PSSession { return New-Object PSObject }
+            Mock New-PSSession { return (New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession') }
             Mock Invoke-Command {
                 return [PSCustomObject]@{ StatusCode = 200 }
             }
@@ -102,7 +102,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
                 'testuser', (ConvertTo-SecureString 'testpass' -AsPlainText -Force)
             )
 
-            Mock New-PSSession { return New-Object PSObject }
+            Mock New-PSSession { return (New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession') }
             Mock Invoke-Command {
                 return [PSCustomObject]@{ StatusCode = 200 }
             }
@@ -121,7 +121,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
             )
             $failedNodes = [System.Collections.ArrayList]::new()
 
-            Mock New-PSSession { return New-Object PSObject }
+            Mock New-PSSession { return (New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession') }
             # When Invoke-Command receives a non-PSSession, it may throw.
             # The function catches exceptions and adds to failed nodes list.
             Mock Invoke-Command { throw 'Not a real session' }

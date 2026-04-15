@@ -18,7 +18,7 @@ Describe 'StackHCI Logging Functions' {
             Write-Log -Level 'INFO' -Message 'Test message'
 
             $logFile | Should -Exist
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*INFO*Test message*'
         }
 
@@ -28,7 +28,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-Log -Level 'WARN' -Message 'Timestamp test'
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             # Timestamp format: yyyy/MM/dd HH:mm:ss
             $content | Should -Match '^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}'
         }
@@ -39,7 +39,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-Log -Message 'Default level test'
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*INFO*Default level test*'
         }
 
@@ -54,7 +54,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-Log -Level 'ERROR' -Message 'Error occurred'
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*ERROR*Error occurred*'
         }
 
@@ -64,7 +64,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-Log -Level 'DEBUG' -Message 'Debug info'
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*DEBUG*Debug info*'
         }
 
@@ -74,7 +74,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-Log -Level 'FATAL' -Message 'Fatal error'
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*FATAL*Fatal error*'
         }
 
@@ -96,7 +96,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-VerboseLog -Message 'Verbose msg'
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*DEBUG*Verbose msg*'
         }
 
@@ -118,7 +118,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-InfoLog -Message 'Info msg'
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*INFO*Info msg*'
         }
 
@@ -140,7 +140,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-WarnLog -Message 'Warn msg' 3>$null
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*WARN*Warn msg*'
         }
 
@@ -157,7 +157,7 @@ Describe 'StackHCI Logging Functions' {
 
             Write-ErrorLog -Message 'Test error' 2>$null
 
-            $content = Get-Content $logFile
+            $content = Get-Content $logFile -Raw
             $content | Should -BeLike '*ERROR*Test error*'
         }
 

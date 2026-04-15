@@ -142,7 +142,7 @@ Describe 'StackHCI Environment Functions' {
             $originalVal = $env:DEPLOYMENTTYPE
             try {
                 $env:DEPLOYMENTTYPE = $null
-                # On a non-HCI machine, the registry key won't exist
+                Mock Get-ItemProperty { throw 'Registry key not found' }
                 ValidateCloudDeployment | Should -Be $false
             } finally {
                 $env:DEPLOYMENTTYPE = $originalVal
@@ -153,6 +153,7 @@ Describe 'StackHCI Environment Functions' {
             $originalVal = $env:DEPLOYMENTTYPE
             try {
                 $env:DEPLOYMENTTYPE = 'on_premise'
+                Mock Get-ItemProperty { throw 'Registry key not found' }
                 ValidateCloudDeployment | Should -Be $false
             } finally {
                 $env:DEPLOYMENTTYPE = $originalVal

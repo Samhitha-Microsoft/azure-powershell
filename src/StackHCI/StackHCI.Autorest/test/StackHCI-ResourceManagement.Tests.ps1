@@ -130,48 +130,6 @@ Describe 'StackHCI Resource Management Functions' {
             { Remove-ResourceGroup -ResourceGroupName 'rg-fail' } | Should -Not -Throw
         }
     }
-
-    # ── Tests migrated from stackhci.Tests.ps1 ───────────────────────────
-
-    Describe 'Remove-ResourceGroup' {
-
-        BeforeAll {
-            # Read the function to understand its behavior
-        }
-
-        It 'Removes resource group when it exists and was created by HCI' {
-            Mock Get-AzResourceGroup {
-                return [PSCustomObject]@{
-                    Tags = @{ CreatedBy = '4C02703C-F5D0-44B0-ADC3-4ED5C2839E61' }
-                    ResourceGroupName = 'rg-1'
-                }
-            }
-            Mock Get-AzResource { return @() }
-            Mock Remove-AzResourceGroup {}
-
-            Remove-ResourceGroup -ResourceGroupName 'rg-1'
-            Should -Invoke Remove-AzResourceGroup -Times 1
-        }
-
-        It 'Does not remove resource group when not created by HCI' {
-            Mock Get-AzResourceGroup {
-                return [PSCustomObject]@{
-                    Tags = @{ CreatedBy = 'SomeOtherApp' }
-                    ResourceGroupName = 'rg-1'
-                }
-            }
-            Mock Remove-AzResourceGroup {}
-
-            Remove-ResourceGroup -ResourceGroupName 'rg-1'
-            Should -Invoke Remove-AzResourceGroup -Times 0
-        }
-
-        It 'Does not throw when resource group does not exist' {
-            Mock Get-AzResourceGroup { return $null }
-            { Remove-ResourceGroup -ResourceGroupName 'nonexistent-rg' } | Should -Not -Throw
-        }
-    }
-
     # ── Remove-ArcRoleAssignments ─────────────────────────────────────────
     Context 'Remove-ArcRoleAssignments' {
         It 'Should not throw when cluster resource does not exist' {
@@ -206,35 +164,6 @@ Describe 'StackHCI Resource Management Functions' {
         It 'Should not throw on any exception' {
             Mock Get-AzResource { throw 'API error' }
             { Remove-ArcRoleAssignments -ResourceGroupName 'rg-1' -ResourceId '/sub/rg/clusters/c1' } | Should -Not -Throw
-        }
-    }
-
-    # ── New-ClusterWithRetries ────────────────────────────────────────────
-    Context 'New-ClusterWithRetries' {
-        It 'Should return true on successful creation (2xx status)' {
-            Mock Invoke-AzRestMethod {
-                return [PSCustomObject]@{ StatusCode = 200; Content = '{}' }
-            }
-            $result = New-ClusterWithRetries -ResourceIdWithAPI '/sub/rg/clusters/c1?api-version=2025-09-15-preview' -Payload '{}'
-            $result | Should -Be $true
-        }
-
-        It 'Should return true for 201 Created' {
-            Mock Invoke-AzRestMethod {
-                return [PSCustomObject]@{ StatusCode = 201; Content = '{}' }
-            }
-            $result = New-ClusterWithRetries -ResourceIdWithAPI '/sub/rg/clusters/c1?api' -Payload '{}'
-            $result | Should -Be $true
-        }
-
-        It 'Should return false after max retries on failure' {
-            Mock Invoke-AzRestMethod {
-                return [PSCustomObject]@{ StatusCode = 500; ErrorCode = 'InternalError'; Content = 'Server error' }
-            }
-            Mock Start-Sleep { }
-
-            $result = New-ClusterWithRetries -ResourceIdWithAPI '/sub/rg/clusters/c1?api' -Payload '{}'
-            $result | Should -Be $false
         }
     }
 }

@@ -99,7 +99,7 @@ Describe 'Verify-NodesArcRegistrationState' {
                 )
             }
 
-            { Verify-NodesArcRegistrationState -ClusterNodes $clusterNodes -SubscriptionId 'sub-1' -ArcResourceGroupName 'rg-1' -ClusterDNSSuffix 'contoso.local' } | Should -Throw '*verification incomplete*expected results from 3*received from 2*'
+            { Verify-NodesArcRegistrationState -ClusterNodes $clusterNodes -SubscriptionId 'sub-1' -ArcResourceGroupName 'rg-1' -ClusterDNSSuffix 'contoso.local' } | Should -Throw '*verification incomplete*expected results from 3*but received from 2*'
         }
     }
 
@@ -113,7 +113,7 @@ Describe 'Verify-NodesArcRegistrationState' {
                 return $null
             }
 
-            { Verify-NodesArcRegistrationState -ClusterNodes $clusterNodes -SubscriptionId 'sub-1' -ArcResourceGroupName 'rg-1' -ClusterDNSSuffix 'contoso.local' } | Should -Throw '*verification incomplete*expected results from 1*received from 0*'
+            { Verify-NodesArcRegistrationState -ClusterNodes $clusterNodes -SubscriptionId 'sub-1' -ArcResourceGroupName 'rg-1' -ClusterDNSSuffix 'contoso.local' } | Should -Throw '*verification incomplete*expected results from 1*but received from 0*'
         }
     }
 
@@ -124,26 +124,25 @@ Describe 'Verify-NodesArcRegistrationState' {
             )
 
             Mock Invoke-Command {
-                # Simulate Invoke-Command populating the ErrorVariable with an OpenError
+                # Use Write-Error to populate the -ErrorVariable that the caller passes.
+                # PowerShell's engine captures errors written via Write-Error into the
+                # variable specified by -ErrorVariable on the calling side.
                 $openError = [System.Management.Automation.ErrorRecord]::new(
                     [System.Exception]::new("WinRM cannot connect to Node1.contoso.local"),
                     "PSSessionOpenFailed",
                     [System.Management.Automation.ErrorCategory]::OpenError,
                     "Node1.contoso.local"
                 )
-                # Write to the ErrorVariable by name that was passed via -ErrorVariable
-                $PSCmdlet.WriteError($openError)
+                Write-Error -ErrorRecord $openError -ErrorAction Continue
                 return $null
-            } -ParameterFilter { $ErrorVariable -eq 'remoteErrors' -or $true }
+            }
 
-            # Since mocking ErrorVariable propagation is non-trivial in Pester,
-            # we test the logic by directly invoking the error-classification code path.
-            # Build the scenario manually:
+            # The mock populates -ErrorVariable with an OpenError via Write-Error.
+            # The function classifies it and throws an appropriate message.
+            # If ErrorVariable propagation doesn't work, the null-result check still fires.
             $threw = $false
             $errorMsg = ''
             try {
-                # We call the function; the mock won't populate ErrorVariable correctly,
-                # but the null-result check will still fire (0 results for 1 node).
                 Verify-NodesArcRegistrationState -ClusterNodes $clusterNodes -SubscriptionId 'sub-1' -ArcResourceGroupName 'rg-1' -ClusterDNSSuffix 'contoso.local'
             } catch {
                 $threw = $true

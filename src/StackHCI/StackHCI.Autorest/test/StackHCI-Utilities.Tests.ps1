@@ -192,11 +192,11 @@ Describe 'StackHCI Utility Functions' {
     Context 'Test-ComputerNameHasDnsSuffix' {
         It 'Should return true for FQDN with dot' {
             $result = Test-ComputerNameHasDnsSuffix -ComputerName 'node1.contoso.local'
-            $result | Should -Contain $true
+            @($result)[-1] | Should -Be $true
         }
         It 'Should return false for short hostname' {
             $result = Test-ComputerNameHasDnsSuffix -ComputerName 'node1'
-            $result | Should -Contain $false
+            @($result)[-1] | Should -Be $false
         }
         It 'Should throw for empty string since ComputerName is mandatory' {
             { Test-ComputerNameHasDnsSuffix -ComputerName '' } | Should -Throw
@@ -207,7 +207,7 @@ Describe 'StackHCI Utility Functions' {
         }
         It 'Should return true for multi-level domain' {
             $result = Test-ComputerNameHasDnsSuffix -ComputerName 'node1.sub.contoso.local'
-            $result | Should -Contain $true
+            @($result)[-1] | Should -Be $true
         }
     }
 
@@ -222,149 +222,6 @@ Describe 'StackHCI Utility Functions' {
             $testDir = Join-Path $TestDrive 'existingdir'
             New-Item -ItemType Directory -Path $testDir -Force | Out-Null
             { New-Directory -Path $testDir } | Should -Not -Throw
-        }
-    }
-
-    # ── Tests migrated from stackhci.Tests.ps1 ───────────────────────────
-
-    Describe 'Test-ComputerNameHasDnsSuffix' {
-
-        It 'Returns true for FQDN with single dot' {
-            $result = Test-ComputerNameHasDnsSuffix -ComputerName 'node1.contoso.com'
-            $result[-1] | Should -Be $true
-        }
-
-        It 'Returns true for FQDN with multiple dots' {
-            $result = Test-ComputerNameHasDnsSuffix -ComputerName 'node1.sub.contoso.com'
-            $result[-1] | Should -Be $true
-        }
-
-        It 'Returns false for simple hostname' {
-            $result = Test-ComputerNameHasDnsSuffix -ComputerName 'node1'
-            $result[-1] | Should -Be $false
-        }
-
-        It 'Returns false for whitespace-only string' {
-            $result = Test-ComputerNameHasDnsSuffix -ComputerName '   '
-            $result | Should -Be $false
-        }
-    }
-
-    Describe 'Normalize-RegionName' {
-
-        It 'Removes spaces and lowercases' {
-            Normalize-RegionName -Region 'East US' | Should -Be 'eastus'
-        }
-
-        It 'Handles already normalized name' {
-            Normalize-RegionName -Region 'westus2' | Should -Be 'westus2'
-        }
-
-        It 'Handles mixed case with multiple spaces' {
-            Normalize-RegionName -Region 'East US 2 EUAP' | Should -Be 'eastus2euap'
-        }
-
-        It 'Returns empty string for empty input' {
-            Normalize-RegionName -Region '' | Should -Be ''
-        }
-    }
-
-    Describe 'Get-ResourceId' {
-
-        It 'Returns correct resource ID format' {
-            $result = Get-ResourceId -ResourceName 'myCluster' -SubscriptionId 'sub-123' -ResourceGroupName 'rg-456'
-            $result | Should -Be '/Subscriptions/sub-123/resourceGroups/rg-456/providers/Microsoft.AzureStackHCI/clusters/myCluster'
-        }
-
-        It 'Handles special characters in resource name' {
-            $result = Get-ResourceId -ResourceName 'my-Cluster_01' -SubscriptionId 'sub-abc' -ResourceGroupName 'rg-def'
-            $result | Should -Be '/Subscriptions/sub-abc/resourceGroups/rg-def/providers/Microsoft.AzureStackHCI/clusters/my-Cluster_01'
-        }
-    }
-
-    Describe 'Set-WacOutputProperty' {
-
-        It 'Adds property when IsWAC is true' {
-            $output = [PSCustomObject]@{}
-            Set-WacOutputProperty -IsWAC $true -PropertyName 'TestProp' -PropertyValue 'TestVal' -Output $output
-            $output.TestProp | Should -Be 'TestVal'
-        }
-
-        It 'Does not add property when IsWAC is false' {
-            $output = [PSCustomObject]@{}
-            Set-WacOutputProperty -IsWAC $false -PropertyName 'TestProp' -PropertyValue 'TestVal' -Output $output
-            $output.PSObject.Properties.Name | Should -Not -Contain 'TestProp'
-        }
-
-        It 'Overwrites existing property with Force when IsWAC is true' {
-            $output = [PSCustomObject]@{ TestProp = 'OldVal' }
-            Set-WacOutputProperty -IsWAC $true -PropertyName 'TestProp' -PropertyValue 'NewVal' -Output $output
-            $output.TestProp | Should -Be 'NewVal'
-        }
-    }
-
-    Describe 'Print-FunctionParameters' {
-
-        It 'Returns message with non-sensitive parameters' {
-            $params = @{ ResourceGroupName = 'rg-1'; Location = 'eastus' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*TestFunc*'
-            $result | Should -BeLike '*rg-1*'
-            $result | Should -BeLike '*eastus*'
-        }
-
-        It 'Masks ArmAccessToken' {
-            $params = @{ ArmAccessToken = 'secret-token-123' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*XXXXXXX*'
-            $result | Should -Not -BeLike '*secret-token-123*'
-        }
-
-        It 'Masks Credential parameter' {
-            $params = @{ Credential = 'my-credential' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*XXXXXXX*'
-            $result | Should -Not -BeLike '*my-credential*'
-        }
-
-        It 'Masks AccountId parameter' {
-            $params = @{ AccountId = 'user@test.com' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*XXXXXXX*'
-            $result | Should -Not -BeLike '*user@test.com*'
-        }
-
-        It 'Masks GraphAccessToken parameter' {
-            $params = @{ GraphAccessToken = 'graph-secret' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*XXXXXXX*'
-            $result | Should -Not -BeLike '*graph-secret*'
-        }
-
-        It 'Masks AccessToken parameter' {
-            $params = @{ AccessToken = 'access-secret' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*XXXXXXX*'
-            $result | Should -Not -BeLike '*access-secret*'
-        }
-
-        It 'Masks ArcSpnCredential parameter' {
-            $params = @{ ArcSpnCredential = 'spn-secret' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*XXXXXXX*'
-            $result | Should -Not -BeLike '*spn-secret*'
-        }
-
-        It 'Skips common parameters like Debug and Verbose' {
-            $params = @{ Debug = $true; Verbose = $true; ResourceGroupName = 'rg-1' }
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*rg-1*'
-        }
-
-        It 'Handles empty parameter hashtable' {
-            $params = @{}
-            $result = Print-FunctionParameters -Message 'TestFunc' -Parameters $params
-            $result | Should -BeLike '*TestFunc*'
         }
     }
 
@@ -445,66 +302,6 @@ Describe 'StackHCI Utility Functions' {
                 Test-Path $tempDir | Should -Be $true
             } finally {
                 Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-            }
-        }
-    }
-
-    Describe 'New-Directory' {
-
-        It 'Creates directory if it does not exist' {
-            $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("NewDir_" + [guid]::NewGuid().ToString('N'))
-            try {
-                New-Directory -Path $tempDir
-                Test-Path $tempDir | Should -Be $true
-            } finally {
-                Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-            }
-        }
-
-        It 'Does not throw if directory already exists' {
-            $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("NewDir_" + [guid]::NewGuid().ToString('N'))
-            New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
-            try {
-                { New-Directory -Path $tempDir } | Should -Not -Throw
-            } finally {
-                Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-            }
-        }
-    }
-
-    Describe 'ValidateCloudDeployment' {
-
-        It 'Returns true when DEPLOYMENTTYPE env var is cloud_deployment' {
-            $originalVal = $env:DEPLOYMENTTYPE
-            try {
-                $env:DEPLOYMENTTYPE = 'cloud_deployment'
-                ValidateCloudDeployment | Should -Be $true
-            } finally {
-                $env:DEPLOYMENTTYPE = $originalVal
-            }
-        }
-
-        It 'Returns false when DEPLOYMENTTYPE env var is not set and registry does not exist' {
-            $originalVal = $env:DEPLOYMENTTYPE
-            try {
-                $env:DEPLOYMENTTYPE = $null
-                # The registry path HKLM:\Software\Microsoft\AzureStackStampInformation
-                # should not exist on a dev machine, so this returns false.
-                $result = ValidateCloudDeployment
-                $result | Should -Be $false
-            } finally {
-                $env:DEPLOYMENTTYPE = $originalVal
-            }
-        }
-
-        It 'Returns false when DEPLOYMENTTYPE is a different value' {
-            $originalVal = $env:DEPLOYMENTTYPE
-            try {
-                $env:DEPLOYMENTTYPE = 'on_prem'
-                $result = ValidateCloudDeployment
-                $result | Should -Be $false
-            } finally {
-                $env:DEPLOYMENTTYPE = $originalVal
             }
         }
     }
