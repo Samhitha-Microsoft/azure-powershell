@@ -8,6 +8,13 @@ Describe 'StackHCI Resource Management Functions' {
         $customPath = Join-Path $PSScriptRoot '..' 'custom' 'stackhci.ps1'
         . $customPath
 
+        # Stubs for Az.Resources commands not available when only Az.StackHCI is loaded
+        foreach ($cmd in @('Get-AzRoleAssignment','New-AzRoleAssignment','Remove-AzRoleAssignment','Get-AzResource','Get-AzResourceGroup','Get-AzADApplication','Get-AzResourceProvider','Register-AzResourceProvider','New-AzResourceGroup','Remove-AzResourceGroup','Invoke-AzResourceAction')) {
+            if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
+                Set-Item "function:global:$cmd" { }
+            }
+        }
+
         function Write-WarnLog { param([string]$Message) }
         function Write-VerboseLog { param([string]$Message) }
         function Write-ErrorLog {
