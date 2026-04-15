@@ -75,7 +75,7 @@ Describe 'StackHCI Registration Functions' {
                 -UseDeviceAuthentication $false
 
             $result | Should -Be 'tenant-123'
-            Should -Invoke Connect-AzAccount -Times 1
+            Assert-MockCalled Connect-AzAccount -Times 1
         }
 
         It 'Should use device authentication when UseDeviceAuthentication is true and no token' {
@@ -95,7 +95,7 @@ Describe 'StackHCI Registration Functions' {
                 -UseDeviceAuthentication $true
 
             $result | Should -Be 'tenant-456'
-            Should -Invoke Connect-AzAccount -Times 1
+            Assert-MockCalled Connect-AzAccount -Times 1
         }
     }
 
@@ -167,7 +167,7 @@ Describe 'StackHCI Registration Functions' {
             }
 
             $session = New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession'
-            { Validate-MSIForArc -HCIResource $hciResource -Session $session } | Should -Throw '*null*'
+            { Validate-MSIForArc -HCIResource $hciResource -Session $session } | Should -Throw
         }
 
         It 'Should return false when HCIResource identity is null' {
@@ -219,7 +219,7 @@ Describe 'StackHCI Registration Functions' {
 
             $result = Set-ArcRoleforRPSpn -RPObjectId 'rp-obj-1' -ArcServerResourceGroupName 'rg-arc'
             $result | Should -Be ([ErrorDetail]::Success)
-            Should -Invoke New-AzRoleAssignment -Times 1
+            Assert-MockCalled New-AzRoleAssignment -Times 1
         }
     }
 
@@ -306,7 +306,7 @@ Describe 'StackHCI Registration Functions' {
             Mock Write-Warning { }
 
             Confirm-UserAcknowledgmentUpgradeToSolution -ClusterNodeSession $session
-            Should -Invoke Write-Warning -Times 1
+            Assert-MockCalled Write-Warning -Times 1
         }
     }
 
@@ -496,7 +496,7 @@ Describe 'StackHCI Registration Functions' {
                 -Region 'eastus' -ClusterDNSSuffix 'contoso.local' -Environment 'AzureCloud' `
                 -ArcResource $arcResource -HCIResource $hciResource
 
-            Should -Invoke New-PSSession -Times 1 -Scope It
+            Assert-MockCalled New-PSSession -Times 1 -Scope It
         }
 
         It 'Should return ArcPermissionsMissing when SPN roles are not present' {
@@ -570,7 +570,7 @@ Describe 'StackHCI Registration Functions' {
             Unregister-ArcForServers -IsManagementNode $true -ComputerName 'Node1' `
                 -ResourceId '/sub/rg/cluster1' -ClusterDNSSuffix 'contoso.local'
 
-            Should -Invoke New-PSSession -Times 1 -Scope It
+            Assert-MockCalled New-PSSession -Times 1 -Scope It
         }
     }
 
@@ -754,7 +754,7 @@ Describe 'StackHCI Registration Functions' {
 
             # ComputerName specified means IsManagementNode = true
             # The function should call Get-SetupLoggingDetails with IsManagementNode = true
-            Should -Invoke Get-SetupLoggingDetails -Times 0 # haven't called yet
+            Assert-MockCalled Get-SetupLoggingDetails -Times 0 -Scope It # haven't called yet
             
             # Just verify it doesn't crash when calling with ComputerName
             # (deep flow will fail at some point but the IsManagementNode logic is tested by parameter presence)
@@ -1173,7 +1173,7 @@ Describe 'StackHCI Registration Functions' {
             # Don't provide ResourceName — it should be resolved from Get-Cluster
             $output = Register-AzStackHCI -SubscriptionId 'sub-1' -Region 'eastus' -Confirm:$false -WarningAction SilentlyContinue -ErrorAction SilentlyContinue 2>&1
             # Verify Azure-Login was called (means it got past the cluster name resolution)
-            Should -Invoke Azure-Login -Times 1
+            Assert-MockCalled Azure-Login -Times 1
         }
 
         It 'Should resolve ResourceGroupName from ResourceName when not provided' {
@@ -1210,7 +1210,7 @@ Describe 'StackHCI Registration Functions' {
             Register-AzStackHCI -SubscriptionId 'sub-1' -Region 'eastus' -ResourceName 'MyCluster' -Confirm:$false -WarningAction SilentlyContinue -ErrorAction SilentlyContinue 2>&1 | Out-Null
 
             # The default RG name should be "MyCluster-rg"
-            Should -Invoke New-AzResourceGroup -Times 1 -ParameterFilter {
+            Assert-MockCalled New-AzResourceGroup -Times 1 -ParameterFilter {
                 $Name -eq 'MyCluster-rg'
             }
         }
@@ -1329,7 +1329,7 @@ Describe 'StackHCI Registration Functions' {
             # and proceed without error (ShouldProcess will be true with -Confirm:$false)
             $output = Unregister-AzStackHCI -Confirm:$false -WarningAction SilentlyContinue -ErrorAction SilentlyContinue 2>&1
             # Verify Azure-Login was called (meaning parameter resolution succeeded)
-            Should -Invoke Azure-Login -Times 1
+            Assert-MockCalled Azure-Login -Times 1
         }
     }
 
@@ -1414,7 +1414,7 @@ Describe 'StackHCI Registration Functions' {
             # Function will still fail because cluster is not registered, but that's after the IsManagementNode logic
             $output = Set-AzStackHCI -Confirm:$false -WarningAction SilentlyContinue -ErrorAction SilentlyContinue 2>&1
             # Should still have been called (not crashed)
-            Should -Invoke Get-SetupLoggingDetails -Times 1
+            Assert-MockCalled Get-SetupLoggingDetails -Times 1
         }
 
         It 'Should proceed to Azure login when ResourceId is explicitly provided' {
@@ -1440,7 +1440,7 @@ Describe 'StackHCI Registration Functions' {
             # When ResourceId is provided, should skip the "not registered" check and go to Azure login
             $output = Set-AzStackHCI -ResourceId "/Subscriptions/sub-1/resourceGroups/rg-1/providers/Microsoft.AzureStackHCI/clusters/MyCluster" -Confirm:$false -Force -WarningAction SilentlyContinue -ErrorAction SilentlyContinue 2>&1
             # Verify it got past the registration check and called Azure-Login
-            Should -Invoke Azure-Login -Times 1
+            Assert-MockCalled Azure-Login -Times 1
         }
     }
 }

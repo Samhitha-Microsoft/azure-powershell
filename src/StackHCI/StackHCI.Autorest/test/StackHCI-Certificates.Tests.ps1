@@ -92,7 +92,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
             Check-ConnectionToCloudBillingService -ClusterNodes $clusterNodes -HealthEndpoint 'https://test/health' -HealthEndPointCheckFailedNodes $failedNodes -ClusterDNSSuffix 'contoso.local'
 
             # Verify New-PSSession was called for each node
-            Should -Invoke New-PSSession -Times 3
+            Assert-MockCalled New-PSSession -Times 3
         }
 
         It 'Should pass Credential to New-PSSession when provided' {
@@ -109,7 +109,7 @@ Describe 'StackHCI Certificate and Connectivity Functions' {
 
             Check-ConnectionToCloudBillingService -ClusterNodes $clusterNodes -Credential $testCred -HealthEndpoint 'https://test/health' -HealthEndPointCheckFailedNodes $failedNodes -ClusterDNSSuffix 'contoso.local'
 
-            Should -Invoke New-PSSession -Times 1 -ParameterFilter {
+            Assert-MockCalled New-PSSession -Times 1 -ParameterFilter {
                 $null -ne $Credential
             }
         }

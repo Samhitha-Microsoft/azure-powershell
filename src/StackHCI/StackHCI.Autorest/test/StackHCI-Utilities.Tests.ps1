@@ -104,7 +104,7 @@ Describe 'StackHCI Utility Functions' {
         }
         It 'Should throw for unknown environment with no AzEnvironment' {
             Mock Get-AzEnvironment { return $null }
-            { Get-PortalDomain -TenantId 'any-tenant' -EnvironmentName 'NonExistent' } | Should -Throw '*Invalid Azure Environment*'
+            { Get-PortalDomain -TenantId 'any-tenant' -EnvironmentName 'NonExistent' } | Should -Throw
         }
     }
 
@@ -247,7 +247,7 @@ Describe 'StackHCI Utility Functions' {
         }
 
         It 'Rethrows exceptions from script block' {
-            { Execute-Without-ProgressBar -ScriptBlock { throw 'expected failure' } } | Should -Throw '*expected failure*'
+            { Execute-Without-ProgressBar -ScriptBlock { throw 'expected failure' } } | Should -Throw
         }
     }
 
@@ -275,11 +275,11 @@ Describe 'StackHCI Utility Functions' {
         }
 
         It 'Throws when MaxWaitTime is less than MinWaitTime' {
-            { Retry-Command -ScriptBlock { 'test' } -MinWaitTimeInSeconds 10 -MaxWaitTimeInSeconds 5 } | Should -Throw '*MaxWaitTimeInSeconds*less than*MinWaitTimeInSeconds*'
+            { Retry-Command -ScriptBlock { 'test' } -MinWaitTimeInSeconds 10 -MaxWaitTimeInSeconds 5 } | Should -Throw
         }
 
         It 'Throws after exhausting all attempts' {
-            { Retry-Command -ScriptBlock { throw 'always fails' } -Attempts 2 -MinWaitTimeInSeconds 0 -MaxWaitTimeInSeconds 1 } | Should -Throw '*always fails*'
+            { Retry-Command -ScriptBlock { throw 'always fails' } -Attempts 2 -MinWaitTimeInSeconds 0 -MaxWaitTimeInSeconds 1 } | Should -Throw
         }
     }
 

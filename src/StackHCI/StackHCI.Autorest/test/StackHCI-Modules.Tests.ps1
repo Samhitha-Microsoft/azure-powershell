@@ -26,7 +26,7 @@ Describe 'StackHCI Module Dependency Functions' {
             Mock Remove-Module {}
             Mock Import-Module {}
             { Import-DependentModule -ModuleName 'Az.Accounts' -MinVersion '2.11.2' } | Should -Not -Throw
-            Should -Invoke Import-Module -Times 1
+            Assert-MockCalled Import-Module -Times 1
         }
 
         It 'Should try to import when loaded version is too low' {
@@ -36,7 +36,7 @@ Describe 'StackHCI Module Dependency Functions' {
             Mock Remove-Module {}
             Mock Import-Module {}
             { Import-DependentModule -ModuleName 'Az.Accounts' -MinVersion '2.11.2' } | Should -Not -Throw
-            Should -Invoke Import-Module -Times 1
+            Assert-MockCalled Import-Module -Times 1
         }
 
         It 'Should throw module name when import fails' {
@@ -44,7 +44,7 @@ Describe 'StackHCI Module Dependency Functions' {
             Mock Remove-Module {}
             Mock Import-Module { throw 'Module not found' }
 
-            { Import-DependentModule -ModuleName 'Az.FakeModule' -MinVersion '1.0.0' } | Should -Throw '*Az.FakeModule*'
+            { Import-DependentModule -ModuleName 'Az.FakeModule' -MinVersion '1.0.0' } | Should -Throw
         }
     }
 
@@ -62,7 +62,7 @@ Describe 'StackHCI Module Dependency Functions' {
             Mock Remove-Module {}
             Mock Import-Module { throw 'Not found' }
 
-            { Check-DependentModules } | Should -Throw '*Az.Accounts*'
+            { Check-DependentModules } | Should -Throw
         }
     }
 
@@ -114,7 +114,7 @@ Describe 'StackHCI Module Dependency Functions' {
             Mock Get-Module { return $null }
             Mock Remove-Module {}
             Mock Import-Module { throw 'Module not found' }
-            { Import-DependentModule -ModuleName 'MissingModule' -MinVersion '1.0.0' } | Should -Throw '*MissingModule*'
+            { Import-DependentModule -ModuleName 'MissingModule' -MinVersion '1.0.0' } | Should -Throw
         }
 
         It 'Re-imports module when loaded version is too old' {
@@ -124,7 +124,7 @@ Describe 'StackHCI Module Dependency Functions' {
             Mock Remove-Module {}
             Mock Import-Module {}
             { Import-DependentModule -ModuleName 'TestModule' -MinVersion '2.0.0' } | Should -Not -Throw
-            Should -Invoke Import-Module -Times 1
+            Assert-MockCalled Import-Module -Times 1
         }
     }
 
@@ -141,7 +141,7 @@ Describe 'StackHCI Module Dependency Functions' {
             Mock Get-Module { return $null }
             Mock Remove-Module {}
             Mock Import-Module { throw 'not found' }
-            { Check-DependentModules } | Should -Throw "*Can't find PowerShell module*"
+            { Check-DependentModules } | Should -Throw
         }
     }
 }

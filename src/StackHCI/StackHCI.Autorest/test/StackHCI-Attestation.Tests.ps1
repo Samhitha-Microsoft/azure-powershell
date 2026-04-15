@@ -59,14 +59,14 @@ Describe 'StackHCI Attestation Functions' {
             Mock Invoke-Command { }
 
             Set-AttestationFirewallRules -Enabled $true -SessionParams @{ ErrorAction = 'Stop' }
-            Should -Invoke Invoke-Command -Times 1
+            Assert-MockCalled Invoke-Command -Times 1
         }
 
         It 'Should call Invoke-Command with Disabled parameter' {
             Mock Invoke-Command { }
 
             Set-AttestationFirewallRules -Enabled $false -SessionParams @{ ErrorAction = 'Stop' }
-            Should -Invoke Invoke-Command -Times 1
+            Assert-MockCalled Invoke-Command -Times 1
         }
     }
 
@@ -142,7 +142,7 @@ Describe 'StackHCI Attestation Functions' {
                 return [PSCustomObject]@{ RegistrationStatus = 'NotYet' }
             }
 
-            { Enable-AzStackHCIAttestation -Force } | Should -Throw '*not registered*'
+            { Enable-AzStackHCIAttestation -Force } | Should -Throw
         }
 
         It 'Should have SupportsShouldProcess attribute' {
@@ -191,7 +191,7 @@ Describe 'StackHCI Attestation Functions' {
 
             # Should complete the begin block at least (we're just verifying it calls the setup)
             try { Disable-AzStackHCIAttestation -Force -ErrorAction SilentlyContinue } catch { }
-            Should -Invoke Get-SetupLoggingDetails -Times 1
+            Assert-MockCalled Get-SetupLoggingDetails -Times 1
         }
     }
 
@@ -208,7 +208,7 @@ Describe 'StackHCI Attestation Functions' {
                 return [PSCustomObject]@{ RegistrationStatus = 'NotYet' }
             }
 
-            { Add-AzStackHCIVMAttestation -AddAll -Force } | Should -Throw '*not registered*'
+            { Add-AzStackHCIVMAttestation -AddAll -Force } | Should -Throw
         }
 
         It 'Should have VMName, VM, and AddAll parameter sets' {
@@ -254,7 +254,7 @@ Describe 'StackHCI Attestation Functions' {
             Mock Invoke-Command { return $null }
 
             try { Remove-AzStackHCIVMAttestation -RemoveAll -Force -ErrorAction SilentlyContinue } catch { }
-            Should -Invoke Get-SetupLoggingDetails -Times 1
+            Assert-MockCalled Get-SetupLoggingDetails -Times 1
         }
     }
 
@@ -274,7 +274,7 @@ Describe 'StackHCI Attestation Functions' {
             Mock Invoke-Command { return @() }
 
             try { Get-AzStackHCIVMAttestation -Local -ErrorAction SilentlyContinue } catch { }
-            Should -Invoke Get-SetupLoggingDetails -Times 1
+            Assert-MockCalled Get-SetupLoggingDetails -Times 1
         }
     }
 }

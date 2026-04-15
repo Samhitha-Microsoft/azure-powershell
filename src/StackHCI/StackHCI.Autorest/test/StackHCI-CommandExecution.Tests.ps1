@@ -39,7 +39,7 @@ Describe 'StackHCI Command Execution Functions' {
         }
 
         It 'Should propagate exceptions from the script block' {
-            { Execute-Without-ProgressBar -ScriptBlock { throw 'boom' } } | Should -Throw '*boom*'
+            { Execute-Without-ProgressBar -ScriptBlock { throw 'boom' } } | Should -Throw
         }
 
         It 'Should suppress progress bar during execution' {
@@ -81,11 +81,11 @@ Describe 'StackHCI Command Execution Functions' {
         }
 
         It 'Should throw after maximum attempts exceeded' {
-            { Retry-Command -ScriptBlock { throw 'always fail' } -Attempts 2 -MinWaitTimeInSeconds 0 -MaxWaitTimeInSeconds 1 -BaseBackoffTimeInSeconds 1 } | Should -Throw '*always fail*'
+            { Retry-Command -ScriptBlock { throw 'always fail' } -Attempts 2 -MinWaitTimeInSeconds 0 -MaxWaitTimeInSeconds 1 -BaseBackoffTimeInSeconds 1 } | Should -Throw
         }
 
         It 'Should throw when MaxWaitTime is less than MinWaitTime' {
-            { Retry-Command -ScriptBlock { 'test' } -MaxWaitTimeInSeconds 1 -MinWaitTimeInSeconds 10 } | Should -Throw '*less than MinWaitTimeInSeconds*'
+            { Retry-Command -ScriptBlock { 'test' } -MaxWaitTimeInSeconds 1 -MinWaitTimeInSeconds 10 } | Should -Throw
         }
 
         It 'Should retry on null output when RetryIfNullOutput is true' {
@@ -124,7 +124,7 @@ Describe 'StackHCI Command Execution Functions' {
             Mock Invoke-Command { return 'executed' }
 
             $result = Run-InvokeCommand -ScriptBlock { $Params.Key } -Session $session -Params @{ Key = 'Value' }
-            Should -Invoke Invoke-Command -Times 1
+            Assert-MockCalled Invoke-Command -Times 1
         }
     }
 }

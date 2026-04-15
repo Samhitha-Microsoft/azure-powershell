@@ -38,7 +38,7 @@ Describe 'StackHCI Arc Registration Functions' {
 
             $result = Assign-ArcRoles -SpObjectId 'sp-obj-1' -ResourceGroupName 'rg-1'
             $result | Should -Be $true
-            Should -Invoke New-AzRoleAssignment -Times 1 -ParameterFilter {
+            Assert-MockCalled New-AzRoleAssignment -Times 1 -ParameterFilter {
                 $RoleDefinitionName -eq 'Azure Connected Machine Onboarding'
             }
         }
@@ -53,7 +53,7 @@ Describe 'StackHCI Arc Registration Functions' {
 
             $result = Assign-ArcRoles -SpObjectId 'sp-obj-1' -ResourceGroupName 'rg-1'
             $result | Should -Be $true
-            Should -Invoke New-AzRoleAssignment -Times 1 -ParameterFilter {
+            Assert-MockCalled New-AzRoleAssignment -Times 1 -ParameterFilter {
                 $RoleDefinitionName -eq 'Azure Connected Machine Resource Administrator'
             }
         }
@@ -66,7 +66,7 @@ Describe 'StackHCI Arc Registration Functions' {
 
             $result = Assign-ArcRoles -SpObjectId 'sp-obj-1' -ResourceGroupName 'rg-1'
             $result | Should -Be $true
-            Should -Invoke New-AzRoleAssignment -Times 2
+            Assert-MockCalled New-AzRoleAssignment -Times 2
         }
 
         It 'Should return false when insufficient privileges' {
@@ -224,7 +224,7 @@ Describe 'StackHCI Arc Registration Functions' {
 
             $result = Assign-ArcRoles -SpObjectId 'sp-123' -ResourceGroupName 'rg-1'
             $result | Should -Be $true
-            Should -Invoke New-AzRoleAssignment -Times 2
+            Assert-MockCalled New-AzRoleAssignment -Times 2
         }
 
         It 'Skips creation when roles already exist' {
@@ -238,7 +238,7 @@ Describe 'StackHCI Arc Registration Functions' {
 
             $result = Assign-ArcRoles -SpObjectId 'sp-123' -ResourceGroupName 'rg-1'
             $result | Should -Be $true
-            Should -Invoke New-AzRoleAssignment -Times 0
+            Assert-MockCalled New-AzRoleAssignment -Times 0 -Scope It
         }
 
         It 'Returns false when authorization fails' {

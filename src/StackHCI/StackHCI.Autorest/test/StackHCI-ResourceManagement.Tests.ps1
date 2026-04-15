@@ -28,7 +28,7 @@ Describe 'StackHCI Resource Management Functions' {
 
             Register-ResourceProviderIfRequired -ProviderNamespace 'Microsoft.AzureStackHCI'
 
-            Should -Invoke Register-AzResourceProvider -Times 0
+            Assert-MockCalled Register-AzResourceProvider -Times 0 -Scope It
         }
 
         It 'Should register when some resources are not registered' {
@@ -42,7 +42,7 @@ Describe 'StackHCI Resource Management Functions' {
 
             Register-ResourceProviderIfRequired -ProviderNamespace 'Microsoft.AzureStackHCI'
 
-            Should -Invoke Register-AzResourceProvider -Times 1
+            Assert-MockCalled Register-AzResourceProvider -Times 1
         }
 
         It 'Should throw when registration fails' {
@@ -72,7 +72,7 @@ Describe 'StackHCI Resource Management Functions' {
 
             Remove-ResourceGroup -ResourceGroupName 'rg-no-tags'
 
-            Should -Invoke Remove-AzResourceGroup -Times 0
+            Assert-MockCalled Remove-AzResourceGroup -Times 0 -Scope It
         }
 
         It 'Should not delete when resource group was not created by Az.StackHCI' {
@@ -85,7 +85,7 @@ Describe 'StackHCI Resource Management Functions' {
 
             Remove-ResourceGroup -ResourceGroupName 'rg-other'
 
-            Should -Invoke Remove-AzResourceGroup -Times 0
+            Assert-MockCalled Remove-AzResourceGroup -Times 0 -Scope It
         }
 
         It 'Should delete empty resource group created by Az.StackHCI' {
@@ -99,7 +99,7 @@ Describe 'StackHCI Resource Management Functions' {
 
             Remove-ResourceGroup -ResourceGroupName 'rg-hci'
 
-            Should -Invoke Remove-AzResourceGroup -Times 1
+            Assert-MockCalled Remove-AzResourceGroup -Times 1
         }
 
         It 'Should not delete non-empty resource group even if created by Az.StackHCI' {
@@ -115,7 +115,7 @@ Describe 'StackHCI Resource Management Functions' {
 
             Remove-ResourceGroup -ResourceGroupName 'rg-hci-notempty'
 
-            Should -Invoke Remove-AzResourceGroup -Times 0
+            Assert-MockCalled Remove-AzResourceGroup -Times 0 -Scope It
         }
 
         It 'Should not throw when Remove-AzResourceGroup fails' {
@@ -158,7 +158,7 @@ Describe 'StackHCI Resource Management Functions' {
 
             Remove-ArcRoleAssignments -ResourceGroupName 'rg-1' -ResourceId '/sub/rg/providers/Microsoft.AzureStackHCI/clusters/c1'
 
-            Should -Invoke Remove-AzRoleAssignment -Times 0
+            Assert-MockCalled Remove-AzRoleAssignment -Times 0 -Scope It
         }
 
         It 'Should not throw on any exception' {

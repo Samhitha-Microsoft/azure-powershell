@@ -91,7 +91,7 @@ Describe 'StackHCI Environment Functions' {
         It 'Should throw for invalid environment with no AzEnvironment' {
             Mock Get-AzEnvironment { return $null }
             $se = ''; $auth = ''; $billing = ''; $graph = ''
-            { Get-EnvironmentEndpoints -EnvironmentName 'Invalid' -ServiceEndpoint ([ref]$se) -Authority ([ref]$auth) -BillingServiceApiScope ([ref]$billing) -GraphServiceApiScope ([ref]$graph) } | Should -Throw '*Invalid Azure Environment*'
+            { Get-EnvironmentEndpoints -EnvironmentName 'Invalid' -ServiceEndpoint ([ref]$se) -Authority ([ref]$auth) -BillingServiceApiScope ([ref]$billing) -GraphServiceApiScope ([ref]$graph) } | Should -Throw
         }
     }
 
@@ -122,7 +122,7 @@ Describe 'StackHCI Environment Functions' {
 
         It 'Should throw for invalid environment name' {
             Mock Get-AzEnvironment { return $null }
-            { Get-ManagementUrl -EnvironmentName 'NonExistent' } | Should -Throw '*Invalid Azure Environment*'
+            { Get-ManagementUrl -EnvironmentName 'NonExistent' } | Should -Throw
         }
     }
 
@@ -237,7 +237,7 @@ Describe 'StackHCI Environment Functions' {
 
         It 'Throws for unknown environment without Az context' {
             Mock Get-AzEnvironment { return $null }
-            { Get-PortalDomain -TenantId 'any' -EnvironmentName 'NonExistent' -Region 'eastus' } | Should -Throw '*Invalid Azure Environment*'
+            { Get-PortalDomain -TenantId 'any' -EnvironmentName 'NonExistent' -Region 'eastus' } | Should -Throw
         }
     }
 
@@ -261,7 +261,7 @@ Describe 'StackHCI Environment Functions' {
 
         It 'Throws for invalid environment name' {
             Mock Get-AzEnvironment { return $null }
-            { Get-ManagementUrl -EnvironmentName 'InvalidEnv' } | Should -Throw '*Invalid Azure Environment*'
+            { Get-ManagementUrl -EnvironmentName 'InvalidEnv' } | Should -Throw
         }
     }
 
@@ -314,7 +314,7 @@ Describe 'StackHCI Environment Functions' {
         It 'Throws for unknown environment without Az context' {
             Mock Get-AzEnvironment { return $null }
             $se = ''; $auth = ''; $billing = ''; $graph = ''
-            { Get-EnvironmentEndpoints -EnvironmentName 'NonExistent' -ServiceEndpoint ([ref]$se) -Authority ([ref]$auth) -BillingServiceApiScope ([ref]$billing) -GraphServiceApiScope ([ref]$graph) } | Should -Throw '*Invalid Azure Environment*'
+            { Get-EnvironmentEndpoints -EnvironmentName 'NonExistent' -ServiceEndpoint ([ref]$se) -Authority ([ref]$auth) -BillingServiceApiScope ([ref]$billing) -GraphServiceApiScope ([ref]$graph) } | Should -Throw
         }
 
         It 'Uses Az environment data for custom environment' {

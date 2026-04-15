@@ -69,7 +69,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Install-DeployModule -ModuleName 'Microsoft.AzureStack.Deployment.RemoteSupport'
 
-            Should -Invoke Invoke-DeploymentModuleDownload -Times 0
+            Assert-MockCalled Invoke-DeploymentModuleDownload -Times 0 -Scope It
         }
 
         It 'Should download module when not loaded' {
@@ -84,7 +84,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Install-DeployModule -ModuleName 'Microsoft.AzureStack.Deployment.RemoteSupport'
 
-            Should -Invoke Invoke-DeploymentModuleDownload -Times 1
+            Assert-MockCalled Invoke-DeploymentModuleDownload -Times 1
         }
     }
 
@@ -105,7 +105,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Invoke-DeploymentModuleDownload
 
-            Should -Invoke Invoke-WebRequest -Times 1
+            Assert-MockCalled Invoke-WebRequest -Times 1
         }
     }
 
@@ -140,7 +140,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Install-AzStackHCIRemoteSupport
 
-            Should -Invoke Assert-IsObservabilityStackPresent -Times 1
+            Assert-MockCalled Assert-IsObservabilityStackPresent -Times 1
         }
 
         It 'Should call Install-DeployModule when observability stack is not present and not ArcExtension' {
@@ -159,7 +159,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Install-AzStackHCIRemoteSupport
 
-            Should -Invoke Install-DeployModule -Times 1
+            Assert-MockCalled Install-DeployModule -Times 1
         }
 
         It 'Should have SupportsShouldProcess attribute' {
@@ -181,7 +181,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Remove-AzStackHCIRemoteSupport
 
-            Should -Invoke Assert-IsObservabilityStackPresent -Times 1
+            Assert-MockCalled Assert-IsObservabilityStackPresent -Times 1
         }
 
         It 'Should call Install-DeployModule when observability stack is not present' {
@@ -199,7 +199,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Remove-AzStackHCIRemoteSupport
 
-            Should -Invoke Install-DeployModule -Times 1
+            Assert-MockCalled Install-DeployModule -Times 1
         }
     }
 
@@ -217,8 +217,8 @@ Describe 'StackHCI Remote Support Functions' {
 
             Enable-AzStackHCIRemoteSupport -AccessLevel 'Diagnostics' -AgreeToRemoteSupportConsent
 
-            Should -Invoke Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
-            Should -Invoke Enable-RemoteSupport -Times 1
+            Assert-MockCalled Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
+            Assert-MockCalled Enable-RemoteSupport -Times 1
         }
 
         It 'Should have required AccessLevel parameter' {
@@ -242,7 +242,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Enable-AzStackHCIRemoteSupport -AccessLevel 'Diagnostics' -AgreeToRemoteSupportConsent
 
-            Should -Invoke Install-DeployModule -Times 1
+            Assert-MockCalled Install-DeployModule -Times 1
         }
     }
 
@@ -260,8 +260,8 @@ Describe 'StackHCI Remote Support Functions' {
 
             Disable-AzStackHCIRemoteSupport
 
-            Should -Invoke Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
-            Should -Invoke Disable-RemoteSupport -Times 1
+            Assert-MockCalled Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
+            Assert-MockCalled Disable-RemoteSupport -Times 1
         }
 
         It 'Should call Install-DeployModule when observability stack is not present' {
@@ -277,7 +277,7 @@ Describe 'StackHCI Remote Support Functions' {
 
             Disable-AzStackHCIRemoteSupport
 
-            Should -Invoke Install-DeployModule -Times 1
+            Assert-MockCalled Install-DeployModule -Times 1
         }
     }
 
@@ -295,8 +295,8 @@ Describe 'StackHCI Remote Support Functions' {
 
             $result = Get-AzStackHCIRemoteSupportAccess
 
-            Should -Invoke Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
-            Should -Invoke Get-RemoteSupportAccess -Times 1
+            Assert-MockCalled Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
+            Assert-MockCalled Get-RemoteSupportAccess -Times 1
         }
 
         It 'Should have Cluster and IncludeExpired parameters' {
@@ -320,8 +320,8 @@ Describe 'StackHCI Remote Support Functions' {
 
             $result = Get-AzStackHCIRemoteSupportSessionHistory
 
-            Should -Invoke Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
-            Should -Invoke Get-RemoteSupportSessionHistory -Times 1
+            Assert-MockCalled Import-Module -Times 1 -ParameterFilter { $Name -eq 'DiagnosticsInitializer' }
+            Assert-MockCalled Get-RemoteSupportSessionHistory -Times 1
         }
 
         It 'Should have SessionId, IncludeSessionTranscript, and FromDate parameters' {
@@ -385,7 +385,7 @@ Describe 'StackHCI Remote Support Functions' {
             $regContext, $isRegistered, $session, $params = Get-SetupLoggingDetails -newSession $true
 
             $isRegistered | Should -Be $false
-            Should -Invoke New-PSSession -Times 1
+            Assert-MockCalled New-PSSession -Times 1
         }
 
         It 'Should add ComputerName to params when isManagementNode is true' {
