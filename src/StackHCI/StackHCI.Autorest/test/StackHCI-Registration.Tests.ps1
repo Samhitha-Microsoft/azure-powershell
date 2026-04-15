@@ -294,7 +294,9 @@ Describe 'StackHCI Registration Functions' {
                 return [PSCustomObject]@{ DisplayVersion = '23H2'; BuildNumber = '20351' }
             }
 
-            { Confirm-UserAcknowledgmentToUpgradeOS } | Should -Not -Throw
+            # Pass a session so the function uses Invoke-Command (mocked) instead of running locally
+            $session = New-MockObject -Type 'System.Management.Automation.Runspaces.PSSession'
+            { Confirm-UserAcknowledgmentToUpgradeOS -ClusterNodeSession $session } | Should -Not -Throw
         }
     }
 
